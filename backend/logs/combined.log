@@ -97,3 +97,7 @@
 2026-07-15 13:47:33 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
 2026-07-15 13:47:33 [info]: POST /api/ai/crowd {"ip":"::1"}
 2026-07-15 13:47:33 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 14:30:44 [info]: POST /api/ai/crowd {"ip":"::1"}
+2026-07-15 14:30:44 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 14:30:44 [info]: POST /api/ai/crowd {"ip":"::1"}
+2026-07-15 14:30:44 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
