@@ -83,3 +83,17 @@
 2026-07-15 13:46:33 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
 2026-07-15 13:46:33 [info]: POST /api/ai/sustainability {"ip":"::1"}
 2026-07-15 13:46:33 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 13:46:43 [info]: POST /api/ai/sustainability {"ip":"::1"}
+2026-07-15 13:46:43 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 13:46:43 [info]: POST /api/ai/sustainability {"ip":"::1"}
+2026-07-15 13:46:43 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 13:47:07 [info]: POST /auth/login {"ip":"::1"}
+2026-07-15 13:47:09 [info]: POST /auth/login {"ip":"::1"}
+2026-07-15 13:47:10 [info]: POST /api/ai/crowd {"ip":"::1"}
+2026-07-15 13:47:10 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 13:47:10 [info]: POST /api/ai/crowd {"ip":"::1"}
+2026-07-15 13:47:10 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 13:47:33 [info]: POST /api/ai/crowd {"ip":"::1"}
+2026-07-15 13:47:33 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
+2026-07-15 13:47:33 [info]: POST /api/ai/crowd {"ip":"::1"}
+2026-07-15 13:47:33 [warn]: [StadiumIQ] Gemini unavailable, using mock: {"error":"Gemini API key not configured"}
