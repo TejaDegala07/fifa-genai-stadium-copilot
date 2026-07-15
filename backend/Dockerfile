@@ -3,12 +3,13 @@ FROM node:20
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+
+RUN npm install
 
 COPY . .
 
-RUN chmod +x ./node_modules/.bin/prisma && ./node_modules/.bin/prisma generate
-RUN npm run build
+RUN npx prisma generate
+RUN npx tsc
 
 EXPOSE 3001
 
