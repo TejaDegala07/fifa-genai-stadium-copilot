@@ -1,15 +1,12 @@
-FROM node:18-alpine
+FROM node:20
 
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
 RUN npm ci
 
-# Copy source
 COPY . .
 
-# Generate Prisma client and build
 RUN npx prisma generate
 RUN npm run build
 
