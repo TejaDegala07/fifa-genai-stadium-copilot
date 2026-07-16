@@ -40,13 +40,13 @@ const TransportCard: React.FC<{
       transition={{ duration: 0.4, delay: index * 0.08 }}
       className={cn(
         'glass-card-hover p-5 border relative overflow-hidden',
-        isRecommended ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-white/8'
+        isRecommended ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-black/10 dark:border-white/8'
       )}
     >
       <div className="flex items-start gap-4">
         <div className={cn(
           'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
-          isRecommended ? 'bg-emerald-500/20' : 'bg-white/8'
+          isRecommended ? 'bg-emerald-500/20' : 'bg-black/10 dark:bg-white/8'
         )}>
           <Icon className={cn('w-6 h-6', isRecommended ? 'text-emerald-400' : 'text-muted-foreground')} />
         </div>
@@ -113,7 +113,7 @@ const TransportCard: React.FC<{
 
           {/* Eco bar */}
           <div className="mt-3">
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${option.ecoScore}%` }}
@@ -135,7 +135,7 @@ const TransportCard: React.FC<{
 // ---- Main Page -------------------------------------------------------------
 
 export const TransportPage: React.FC = () => {
-  const { data: aiData, isLoading, analyzeTransport, isUsingMock } = useAI();
+  const { data: aiData, isLoading, analyzeTransport } = useAI();
 
   useEffect(() => {
     analyzeTransport();
@@ -228,7 +228,7 @@ export const TransportPage: React.FC = () => {
                 <span className="text-muted-foreground">Metro vs Rideshare saves</span>
                 <span className="text-emerald-400 font-semibold">~16 kg CO₂</span>
               </div>
-              <div className="h-px bg-white/10 my-2" />
+              <div className="h-px bg-black/10 dark:bg-white/10 my-2" />
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Choosing eco-transport today = planting ~2 trees worth of carbon absorption 🌱
               </p>
@@ -239,7 +239,6 @@ export const TransportPage: React.FC = () => {
           <AIResponseCard
             response={aiData}
             isLoading={isLoading}
-            isUsingMock={isUsingMock}
             title="AI Transport Advisor"
             compact={true}
           />

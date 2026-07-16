@@ -76,11 +76,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-white/10 rounded-full;
+    @apply bg-black/10 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-white/20;
+    @apply bg-black/20;
   }
 
   /* Focus styles for accessibility */
@@ -108,13 +108,24 @@
 
   /* Light theme glass */
   .light .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-gray-200/60 rounded-xl;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+    background-color: #ffffff;
+    border-color: #E2E8F0;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .light .glass-card-hover {
+    background-color: #ffffff;
+    border-color: #E2E8F0;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06);
   }
 
   .light .glass-card-hover:hover {
-    @apply bg-white/90 border-gray-200;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+    background-color: #F8FAFC;
+    border-color: #CBD5E1;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
   }
 
   /* Gradient text */
@@ -149,8 +160,14 @@
 
   /* Shimmer loading skeleton */
   .skeleton {
-    @apply bg-white/5 rounded-lg;
+    @apply rounded-lg;
     background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+  }
+
+  .light .skeleton {
+    background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%);
     background-size: 200% 100%;
     animation: shimmer 1.5s linear infinite;
   }
@@ -171,6 +188,18 @@
 
   .sidebar-item.active {
     @apply bg-primary/15 text-primary border border-primary/20;
+  }
+
+  /* Light mode sidebar item overrides */
+  .light .sidebar-item:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+  }
+
+  .light .sidebar-item.active {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+    border-color: #BFDBFE;
   }
 
   /* KPI Card */
@@ -240,6 +269,10 @@
 
   .bg-white\/8 {
     background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .light .bg-white\/8 {
+    background-color: rgba(0, 0, 0, 0.04);
   }
 }
 

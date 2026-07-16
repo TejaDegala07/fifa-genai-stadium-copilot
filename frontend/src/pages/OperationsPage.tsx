@@ -33,7 +33,7 @@ const CHART_TOOLTIP_STYLE = {
 };
 
 export const OperationsPage: React.FC = () => {
-  const { data: aiData, isLoading, analyzeCrowd, isUsingMock } = useAI();
+  const { data: aiData, isLoading, analyzeCrowd } = useAI();
   const { alerts, unreadCount, acknowledgeAll } = useAlertStore();
   const { incidents } = useIncidentStore();
 
@@ -147,7 +147,7 @@ export const OperationsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm" role="table" aria-label="Zone crowd status">
               <thead>
-                <tr className="text-xs text-muted-foreground uppercase tracking-wide border-b border-white/8">
+                <tr className="text-xs text-muted-foreground uppercase tracking-wide border-b border-black/10 dark:border-white/8">
                   <th className="text-left pb-3 font-medium">Zone</th>
                   <th className="text-center pb-3 font-medium">Occupancy</th>
                   <th className="text-center pb-3 font-medium">Density</th>
@@ -157,7 +157,7 @@ export const OperationsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {MOCK_CROWD_DATA.map((zone) => (
-                  <tr key={zone.zoneId} className="hover:bg-white/3 transition-colors">
+                  <tr key={zone.zoneId} className="hover:bg-black/5 dark:bg-white/3 transition-colors">
                     <td className="py-3">
                       <div className="font-medium text-foreground">{zone.zoneLabel}</div>
                       <div className="text-xs text-muted-foreground">Sec. {zone.section}</div>
@@ -167,7 +167,7 @@ export const OperationsPage: React.FC = () => {
                     </td>
                     <td className="py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="w-16 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full"
                             style={{
@@ -239,7 +239,6 @@ export const OperationsPage: React.FC = () => {
           <AIResponseCard
             response={aiData}
             isLoading={isLoading}
-            isUsingMock={isUsingMock}
             title="AI Operations Insight"
             compact={true}
           />

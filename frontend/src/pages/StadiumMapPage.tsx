@@ -13,24 +13,26 @@ import { SectionHeader } from '../components/ui/SectionHeader';
 import { AIResponseCard } from '../components/ai/AIResponseCard';
 import { useAI } from '../hooks/useAI';
 import { useUserStore } from '../store/useAppStore';
+import { useTranslation } from '../hooks/useTranslation';
 import { MOCK_POIS } from '../data/mockData';
 import { getCrowdBgClass } from '../utils/helpers';
 import { cn } from '../utils/helpers';
 import type { StadiumPOI } from '../types';
+import type { TranslationKey } from '../i18n/translations';
 
 // ---- POI Type Config -------------------------------------------------------
 
-const POI_CONFIG: Record<string, { icon: React.ElementType; label: string; color: string }> = {
-  medical: { icon: Heart, label: 'Medical', color: 'text-red-400' },
-  food: { icon: Utensils, label: 'Food & Drink', color: 'text-amber-400' },
-  washroom: { icon: Droplets, label: 'Restrooms', color: 'text-blue-400' },
-  exit: { icon: DoorOpen, label: 'Exits', color: 'text-emerald-400' },
-  entrance: { icon: DoorOpen, label: 'Entrances', color: 'text-emerald-400' },
-  parking: { icon: Car, label: 'Parking', color: 'text-purple-400' },
-  metro: { icon: Train, label: 'Metro/Rail', color: 'text-cyan-400' },
-  info: { icon: Info, label: 'Info Desk', color: 'text-sky-400' },
-  atm: { icon: Info, label: 'ATM', color: 'text-yellow-400' },
-  accessibility: { icon: Accessibility, label: 'Accessibility', color: 'text-indigo-400' },
+const POI_CONFIG: Record<string, { icon: React.ElementType; labelKey: TranslationKey; color: string }> = {
+  medical: { icon: Heart, labelKey: 'map.poi.medical', color: 'text-red-400' },
+  food: { icon: Utensils, labelKey: 'map.poi.food', color: 'text-amber-400' },
+  washroom: { icon: Droplets, labelKey: 'map.poi.washroom', color: 'text-blue-400' },
+  exit: { icon: DoorOpen, labelKey: 'map.poi.exit', color: 'text-emerald-400' },
+  entrance: { icon: DoorOpen, labelKey: 'map.poi.entrance', color: 'text-emerald-400' },
+  parking: { icon: Car, labelKey: 'map.poi.parking', color: 'text-purple-400' },
+  metro: { icon: Train, labelKey: 'map.poi.metro', color: 'text-cyan-400' },
+  info: { icon: Info, labelKey: 'map.poi.info', color: 'text-sky-400' },
+  atm: { icon: Info, labelKey: 'map.poi.atm', color: 'text-yellow-400' },
+  accessibility: { icon: Accessibility, labelKey: 'map.poi.accessibility', color: 'text-indigo-400' },
 };
 
 // ---- SVG Stadium Map -------------------------------------------------------
@@ -147,6 +149,7 @@ const StadiumMapSVG: React.FC<{
 const POICard: React.FC<{ poi: StadiumPOI; onNavigate: (poi: StadiumPOI) => void }> = ({
   poi, onNavigate
 }) => {
+  const { t } = useTranslation();
   const cfg = POI_CONFIG[poi.type] ?? POI_CONFIG.info;
   const Icon = cfg.icon;
 
@@ -159,25 +162,25 @@ const POICard: React.FC<{ poi: StadiumPOI; onNavigate: (poi: StadiumPOI) => void
   }[poi.currentStatus] ?? 'text-muted-foreground';
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-      <div className={cn('w-8 h-8 rounded-lg bg-white/8 flex items-center justify-center flex-shrink-0', cfg.color)}>
+    <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-black/5 dark:bg-white/5 transition-colors group">
+      <div className={cn('w-8 h-8 rounded-lg bg-black/10 dark:bg-white/8 flex items-center justify-center flex-shrink-0', cfg.color)}>
         <Icon className="w-4 h-4" aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-foreground truncate">{poi.label}</div>
         <div className="text-xs text-muted-foreground flex items-center gap-2">
-          <span className={statusStyle}>● {poi.currentStatus}</span>
-          {poi.waitTimeMinutes !== undefined && <span>{poi.waitTimeMinutes}min wait</span>}
-          {poi.isAccessible && <span title="Wheelchair accessible">♿</span>}
+          <span className={statusStyle}>● {t(`status.${poi.currentStatus}` as TranslationKey)}</span>
+          {poi.waitTimeMinutes !== undefined && <span>{poi.waitTimeMinutes}{t('common.minutes')} {t('common.wait')}</span>}
+          {poi.isAccessible && <span title={t('common.accessible')}>♿</span>}
         </div>
       </div>
       <button
         onClick={() => onNavigate(poi)}
         className="opacity-0 group-hover:opacity-100 focus:opacity-100 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary/15 text-primary text-xs font-medium transition-all duration-200 hover:bg-primary/25"
-        aria-label={`Navigate to ${poi.label}`}
+        aria-label={`${t('map.route')} ${poi.label}`}
       >
         <Navigation className="w-3.5 h-3.5" />
-        Route
+        {t('common.route')}
       </button>
     </div>
   );
@@ -187,14 +190,14 @@ const POICard: React.FC<{ poi: StadiumPOI; onNavigate: (poi: StadiumPOI) => void
 
 type FilterType = 'all' | 'medical' | 'food' | 'washroom' | 'exit' | 'parking' | 'metro';
 
-const FILTER_OPTIONS: { type: FilterType; label: string }[] = [
-  { type: 'all', label: 'All' },
-  { type: 'medical', label: 'Medical' },
-  { type: 'food', label: 'Food' },
-  { type: 'washroom', label: 'Restrooms' },
-  { type: 'exit', label: 'Exits' },
-  { type: 'parking', label: 'Parking' },
-  { type: 'metro', label: 'Metro' },
+const FILTER_OPTIONS: { type: FilterType; labelKey: TranslationKey }[] = [
+  { type: 'all', labelKey: 'map.filter.all' },
+  { type: 'medical', labelKey: 'map.filter.medical' },
+  { type: 'food', labelKey: 'map.filter.food' },
+  { type: 'washroom', labelKey: 'map.filter.restrooms' },
+  { type: 'exit', labelKey: 'map.filter.exits' },
+  { type: 'parking', labelKey: 'map.filter.parking' },
+  { type: 'metro', labelKey: 'map.filter.metro' },
 ];
 
 export const StadiumMapPage: React.FC = () => {
@@ -203,7 +206,8 @@ export const StadiumMapPage: React.FC = () => {
   const [selectedPOI, setSelectedPOI] = useState<StadiumPOI | null>(null);
   const [isWheelchair, setIsWheelchair] = useState(false);
   const { user } = useUserStore();
-  const { data: aiData, isLoading, getNavigation, isUsingMock, reset } = useAI();
+  const { t } = useTranslation();
+  const { data: aiData, isLoading, getNavigation, reset } = useAI();
 
   const handleNavigate = async (poi: StadiumPOI) => {
     setSelectedPOI(poi);
@@ -226,8 +230,8 @@ export const StadiumMapPage: React.FC = () => {
   return (
     <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
       <SectionHeader
-        title="Smart Stadium Map"
-        subtitle="AI-powered navigation with crowd-aware routing"
+        title={t('page.stadiumMap')}
+        subtitle={t('page.stadiumMap.subtitle')}
         icon={Map}
       />
 
@@ -241,9 +245,9 @@ export const StadiumMapPage: React.FC = () => {
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search locations..."
-                className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-primary/40 transition-all"
-                aria-label="Search stadium locations"
+                placeholder={t('map.searchLocations')}
+                className="w-full pl-9 pr-4 py-2 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:border-primary/40 transition-all"
+                aria-label={t('map.searchLocations')}
               />
             </div>
             <button
@@ -252,19 +256,19 @@ export const StadiumMapPage: React.FC = () => {
                 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all',
                 isWheelchair
                   ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30'
-                  : 'bg-white/5 text-muted-foreground border-white/10 hover:border-white/20'
+                  : 'bg-black/5 dark:bg-white/5 text-muted-foreground border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20'
               )}
               aria-pressed={isWheelchair}
-              aria-label="Toggle wheelchair-accessible routes only"
+              aria-label={t('map.accessibleRoutesOnly')}
             >
               <Accessibility className="w-4 h-4" />
-              Accessible
+              {t('map.accessible')}
             </button>
           </div>
 
           {/* Filter pills */}
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {FILTER_OPTIONS.map(({ type, label }) => (
+            {FILTER_OPTIONS.map(({ type, labelKey }) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type)}
@@ -272,17 +276,17 @@ export const StadiumMapPage: React.FC = () => {
                   'flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
                   filterType === type
                     ? 'bg-primary/20 text-primary border-primary/30'
-                    : 'bg-white/5 text-muted-foreground border-white/10 hover:border-white/20'
+                    : 'bg-black/5 dark:bg-white/5 text-muted-foreground border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20'
                 )}
                 aria-pressed={filterType === type}
               >
-                {label}
+                {t(labelKey)}
               </button>
             ))}
           </div>
 
           {/* SVG Map */}
-          <div className="relative h-80 rounded-xl overflow-hidden bg-[#0A0E1A] border border-white/8">
+          <div className="relative h-80 rounded-xl overflow-hidden bg-[#0A0E1A] border border-black/10 dark:border-white/8">
             <StadiumMapSVG
               pois={showPOIs}
               selectedPOI={selectedPOI}
@@ -306,8 +310,7 @@ export const StadiumMapPage: React.FC = () => {
                 <AIResponseCard
                   response={aiData}
                   isLoading={isLoading}
-                  isUsingMock={isUsingMock}
-                  title={`Route to ${selectedPOI.label}`}
+                  title={`${t('map.routeTo')} ${selectedPOI.label}`}
                   compact={true}
                 />
               </motion.div>
@@ -319,14 +322,14 @@ export const StadiumMapPage: React.FC = () => {
         <div className="glass-card p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-foreground">
-              {filterType === 'all' ? 'All Locations' : `${FILTER_OPTIONS.find(f => f.type === filterType)?.label}`}
+              {filterType === 'all' ? t('map.allLocations') : t(FILTER_OPTIONS.find(f => f.type === filterType)?.labelKey as TranslationKey)}
             </h3>
-            <span className="text-xs text-muted-foreground">{showPOIs.length} found</span>
+            <span className="text-xs text-muted-foreground">{showPOIs.length} {t('map.found')}</span>
           </div>
 
           <div className="space-y-1 max-h-[560px] overflow-y-auto scrollbar-hide">
             {showPOIs.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No locations found</p>
+              <p className="text-sm text-muted-foreground text-center py-8">{t('map.noLocations')}</p>
             ) : (
               showPOIs.map((poi) => (
                 <POICard key={poi.id} poi={poi} onNavigate={handleNavigate} />
@@ -336,7 +339,7 @@ export const StadiumMapPage: React.FC = () => {
 
           {isWheelchair && (
             <div className="mt-4 p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-400">
-              ♿ Showing accessible routes only — elevator and ramp paths prioritized
+              {t('map.accessibleRoutesOnly')}
             </div>
           )}
         </div>
@@ -344,20 +347,20 @@ export const StadiumMapPage: React.FC = () => {
 
       {/* Quick Find Buttons */}
       <div className="glass-card p-4">
-        <h3 className="font-semibold text-foreground mb-3 text-sm">Quick Find</h3>
+        <h3 className="font-semibold text-foreground mb-3 text-sm">{t('map.quickFind')}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-          {Object.entries(POI_CONFIG).map(([type, { icon: Icon, label, color }]) => {
+          {Object.entries(POI_CONFIG).map(([type, { icon: Icon, labelKey, color }]) => {
             const nearest = MOCK_POIS.find((p) => p.type === type && p.currentStatus !== 'closed');
             return (
               <button
                 key={type}
                 onClick={() => nearest && handleNavigate(nearest)}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/3 hover:bg-white/8 border border-white/8 hover:border-white/15 transition-all duration-200 group"
-                aria-label={`Find nearest ${label}`}
+                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-black/5 dark:bg-white/3 hover:bg-black/10 dark:hover:bg-white/8 border border-black/10 dark:border-white/8 hover:border-black/15 dark:border-white/15 transition-all duration-200 group"
+                aria-label={`${t('map.nearest')} ${t(labelKey)}`}
               >
                 <Icon className={cn('w-5 h-5', color)} aria-hidden="true" />
                 <span className="text-xs text-muted-foreground group-hover:text-foreground text-center leading-tight">
-                  Nearest {label}
+                  {t('map.nearest')} {t(labelKey)}
                 </span>
               </button>
             );

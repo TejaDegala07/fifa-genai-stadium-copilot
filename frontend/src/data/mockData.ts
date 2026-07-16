@@ -131,32 +131,32 @@ export const MOCK_INCIDENTS: Incident[] = [
 export const MOCK_ALERTS: Alert[] = [
   {
     id: 'ALT-001', type: 'crowd', severity: 'critical',
-    title: 'Critical Crowd Density — North Lower (A)',
-    message: 'Zone A has reached 92% capacity. Recommend diverting incoming fans to Section D or F via alternate entry.',
+    title: 'Critical Crowd Density — North Lower (A)', titleKey: 'alert.crowd.critical.title',
+    message: 'Zone A has reached 92% capacity. Recommend diverting incoming fans to Section D or F via alternate entry.', messageKey: 'alert.crowd.critical.msg',
     zone: 'north-lower', createdAt: new Date(Date.now() - 8 * 60000).toISOString(), acknowledged: false,
   },
   {
     id: 'ALT-002', type: 'crowd', severity: 'critical',
-    title: 'Critical Crowd Density — East Lower (E)',
-    message: 'Zone E at 91% capacity. Gate 5 showing queues >20 min. AI recommends activating overflow protocol.',
+    title: 'Critical Crowd Density — East Lower (E)', titleKey: 'alert.crowd.east.title',
+    message: 'Zone E at 91% capacity. Gate 5 showing queues >20 min. AI recommends activating overflow protocol.', messageKey: 'alert.crowd.east.msg',
     zone: 'east-lower', createdAt: new Date(Date.now() - 6 * 60000).toISOString(), acknowledged: false,
   },
   {
     id: 'ALT-003', type: 'transport', severity: 'medium',
-    title: 'NJ Transit Delay — East Rutherford Line',
-    message: '15-minute delay on inbound trains. Expected 2,400 additional fans arriving via road. Update transport advisories.',
+    title: 'NJ Transit Delay — East Rutherford Line', titleKey: 'alert.transport.delay.title',
+    message: '15-minute delay on inbound trains. Expected 2,400 additional fans arriving via road. Update transport advisories.', messageKey: 'alert.transport.delay.msg',
     createdAt: new Date(Date.now() - 20 * 60000).toISOString(), acknowledged: true, acknowledgedBy: 'Transport Coordinator Kim',
   },
   {
     id: 'ALT-004', type: 'weather', severity: 'low',
-    title: 'Light Rain Expected Post-Match',
-    message: 'Weather forecast: light rain beginning 22:15. Recommend activating covered exit routing for accessible fans.',
+    title: 'Light Rain Expected Post-Match', titleKey: 'alert.weather.rain.title',
+    message: 'Weather forecast: light rain beginning 22:15. Recommend activating covered exit routing for accessible fans.', messageKey: 'alert.weather.rain.msg',
     createdAt: new Date(Date.now() - 45 * 60000).toISOString(), acknowledged: true, acknowledgedBy: 'Ops Manager Rodriguez',
   },
   {
     id: 'ALT-005', type: 'incident', severity: 'high',
-    title: 'Medical Incident — Section E',
-    message: 'Fan receiving medical assistance Section E Row 22. Medical Team Alpha on scene. Status: stable.',
+    title: 'Medical Incident — Section E', titleKey: 'alert.medical.incident.title',
+    message: 'Fan receiving medical assistance Section E Row 22. Medical Team Alpha on scene. Status: stable.', messageKey: 'alert.medical.incident.msg',
     zone: 'east-lower', createdAt: new Date(Date.now() - 10 * 60000).toISOString(), acknowledged: true, acknowledgedBy: 'Dr. Williams',
   },
 ];
@@ -193,14 +193,14 @@ export const MOCK_TRANSPORT_OPTIONS: TransportOption[] = [
 // ---- KPIs ------------------------------------------------------------------
 
 export const MOCK_KPIs: OperationsKPI[] = [
-  { label: 'Total Attendance', value: 79_240, unit: 'fans', change: 2.1, trend: 'up', status: 'good', icon: 'Users' },
-  { label: 'Capacity', value: '96%', change: 0, trend: 'stable', status: 'warning', icon: 'Activity' },
-  { label: 'Active Incidents', value: 3, change: 1, trend: 'up', status: 'warning', icon: 'AlertTriangle' },
-  { label: 'Avg Response Time', value: '4.2', unit: 'min', change: -8.5, trend: 'down', status: 'good', icon: 'Clock' },
-  { label: 'Medical Cases', value: 7, change: 2, trend: 'up', status: 'warning', icon: 'Heart' },
-  { label: 'Volunteers Active', value: 428, change: 0, trend: 'stable', status: 'good', icon: 'HandHelping' },
-  { label: 'Transport Score', value: '72%', change: -5, trend: 'down', status: 'warning', icon: 'Bus' },
-  { label: 'Eco Score', value: 84, unit: '/100', change: 3, trend: 'up', status: 'good', icon: 'Leaf' },
+  { label: 'Total Attendance', labelKey: 'kpi.totalAttendance', value: 79_240, unit: 'fans', change: 2.1, trend: 'up', status: 'good', icon: 'Users' },
+  { label: 'Capacity', labelKey: 'kpi.capacity', value: '96%', change: 0, trend: 'stable', status: 'warning', icon: 'Activity' },
+  { label: 'Active Incidents', labelKey: 'kpi.activeIncidents', value: 3, change: 1, trend: 'up', status: 'warning', icon: 'AlertTriangle' },
+  { label: 'Avg Response Time', labelKey: 'kpi.avgResponseTime', value: '4.2', unit: 'min', change: -8.5, trend: 'down', status: 'good', icon: 'Clock' },
+  { label: 'Medical Cases', labelKey: 'kpi.medicalCases', value: 7, change: 2, trend: 'up', status: 'warning', icon: 'Heart' },
+  { label: 'Volunteers Active', labelKey: 'kpi.volunteersActive', value: 428, change: 0, trend: 'stable', status: 'good', icon: 'HandHelping' },
+  { label: 'Transport Score', labelKey: 'kpi.transportScore', value: '72%', change: -5, trend: 'down', status: 'warning', icon: 'Bus' },
+  { label: 'Eco Score', labelKey: 'kpi.ecoScore', value: 84, unit: '/100', change: 3, trend: 'up', status: 'good', icon: 'Leaf' },
 ];
 
 // ---- Volunteer Tasks -------------------------------------------------------

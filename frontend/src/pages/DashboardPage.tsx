@@ -18,71 +18,14 @@ import { KPICard } from '../components/ui/KPICard';
 import { AlertFeed } from '../components/ui/AlertBanner';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { AIResponseCard } from '../components/ai/AIResponseCard';
-import { useUserStore, useAlertStore, useIncidentStore } from '../store/useAppStore';
+import { useUserStore, useAlertStore, useIncidentStore, useThemeStore } from '../store/useAppStore';
 import { MOCK_KPIs, CROWD_HISTORY, INCIDENT_HISTORY, MOCK_CROWD_DATA } from '../data/mockData';
 import { STADIUM, ROLE_CONFIG, USER_ROLES } from '../data/constants';
 import { getCrowdBgClass, getCrowdLabel, getCrowdColor, formatNumber, timeAgo } from '../utils/helpers';
 import { useAI } from '../hooks/useAI';
+import { useTranslation } from '../hooks/useTranslation';
 import type { UserRole } from '../data/constants';
 
-// ---- Role-specific hero content -------------------------------------------
-
-const ROLE_HERO: Record<UserRole, { greeting: string; focus: string; quickActions: { label: string; path: string; icon: React.ElementType; color: string }[] }> = {
-  fan: {
-    greeting: 'Welcome to the stadium!',
-    focus: "Here's everything you need for a great match day experience.",
-    quickActions: [
-      { label: 'Find My Seat', path: '/map', icon: MapPin, color: 'text-blue-400' },
-      { label: 'Transport Info', path: '/transport', icon: Activity, color: 'text-cyan-400' },
-      { label: 'Report Issue', path: '/emergency', icon: AlertTriangle, color: 'text-red-400' },
-    ],
-  },
-  volunteer: {
-    greeting: 'Volunteer Hub',
-    focus: 'Your active assignments and crowd situation overview.',
-    quickActions: [
-      { label: 'My Tasks', path: '/volunteer', icon: Users, color: 'text-emerald-400' },
-      { label: 'Crowd Intel', path: '/crowd', icon: Activity, color: 'text-orange-400' },
-      { label: 'Emergency', path: '/emergency', icon: AlertTriangle, color: 'text-red-400' },
-    ],
-  },
-  security: {
-    greeting: 'Security Operations',
-    focus: 'Real-time crowd intelligence and incident status.',
-    quickActions: [
-      { label: 'Crowd Intel', path: '/crowd', icon: Activity, color: 'text-orange-400' },
-      { label: 'Incidents', path: '/emergency', icon: AlertTriangle, color: 'text-red-400' },
-      { label: 'Stadium Map', path: '/map', icon: MapPin, color: 'text-blue-400' },
-    ],
-  },
-  operations: {
-    greeting: 'Operations Command',
-    focus: 'Full stadium intelligence at a glance.',
-    quickActions: [
-      { label: 'Announcements', path: '/announcements', icon: Zap, color: 'text-purple-400' },
-      { label: 'Crowd Intel', path: '/crowd', icon: Activity, color: 'text-orange-400' },
-      { label: 'Operations', path: '/operations', icon: TrendingUp, color: 'text-blue-400' },
-    ],
-  },
-  medical: {
-    greeting: 'Medical Command',
-    focus: 'Active cases and medical zone status.',
-    quickActions: [
-      { label: 'Active Cases', path: '/medical', icon: Activity, color: 'text-red-400' },
-      { label: 'Stadium Map', path: '/map', icon: MapPin, color: 'text-blue-400' },
-      { label: 'Report Incident', path: '/emergency', icon: AlertTriangle, color: 'text-amber-400' },
-    ],
-  },
-  transport: {
-    greeting: 'Transport Control',
-    focus: "Live transport status and fan departure analytics.",
-    quickActions: [
-      { label: 'Transport Intel', path: '/transport', icon: Activity, color: 'text-cyan-400' },
-      { label: 'Crowd Map', path: '/map', icon: MapPin, color: 'text-blue-400' },
-      { label: 'Operations', path: '/operations', icon: TrendingUp, color: 'text-purple-400' },
-    ],
-  },
-};
 
 // ---- Weather Widget --------------------------------------------------------
 
@@ -129,7 +72,7 @@ const CrowdSummary: React.FC = () => {
             {pct}%
           </span>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 bg-black/10 rounded-full overflow-hidden dark:bg-white/10">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
@@ -176,7 +119,7 @@ const RecentIncidents: React.FC = () => {
           <p className="text-sm text-muted-foreground text-center py-4">No active incidents 🎉</p>
         ) : (
           active.map((incident) => (
-            <div key={incident.id} className="flex items-start gap-3 p-3 rounded-lg bg-white/3 hover:bg-white/5 transition-colors">
+            <div key={incident.id} className="flex items-start gap-3 p-3 rounded-lg bg-black/3 hover:bg-black/5 transition-colors dark:bg-white/3 dark:hover:bg-white/5">
               <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
                 incident.severity === 'critical' ? 'bg-red-400 animate-pulse' :
                 incident.severity === 'high' ? 'bg-orange-400' :
@@ -202,23 +145,67 @@ const RecentIncidents: React.FC = () => {
   );
 };
 
-// ---- Main Dashboard -------------------------------------------------------
-
-const CHART_TOOLTIP_STYLE = {
-  contentStyle: {
-    backgroundColor: '#0D1117',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '12px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-  },
-  labelStyle: { color: '#9CA3AF', fontSize: 12 },
-};
-
 export const DashboardPage: React.FC = () => {
   const { user } = useUserStore();
+  const { mode } = useThemeStore();
+  const { t } = useTranslation();
   const roleConfig = ROLE_CONFIG[user.role];
-  const hero = ROLE_HERO[user.role];
   const { data: aiData, isLoading: aiLoading, analyzeCrowd } = useAI();
+
+  const isLight = mode === 'light';
+
+  const CHART_TOOLTIP_STYLE = {
+    contentStyle: {
+      backgroundColor: isLight ? '#FFFFFF' : '#0D1117',
+      border: isLight ? '1px solid #E2E8F0' : '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '12px',
+      boxShadow: isLight ? '0 4px 16px rgba(0,0,0,0.1)' : '0 8px 32px rgba(0,0,0,0.4)',
+      color: isLight ? '#0F172A' : '#F9FAFB',
+    },
+    labelStyle: { color: isLight ? '#475569' : '#9CA3AF', fontSize: 12 },
+  };
+
+  const hero = {
+    fan: { greeting: t('hero.fan.greeting'), focus: t('hero.fan.focus') },
+    volunteer: { greeting: t('hero.volunteer.greeting'), focus: t('hero.volunteer.focus') },
+    security: { greeting: t('hero.security.greeting'), focus: t('hero.security.focus') },
+    operations: { greeting: t('hero.operations.greeting'), focus: t('hero.operations.focus') },
+    medical: { greeting: t('hero.medical.greeting'), focus: t('hero.medical.focus') },
+    transport: { greeting: t('hero.transport.greeting'), focus: t('hero.transport.focus') },
+  }[user.role];
+
+  const quickActions = {
+    fan: [
+      { label: t('dashboard.findSeat'), path: '/map', icon: MapPin, color: 'text-blue-400' },
+      { label: t('dashboard.transportInfo'), path: '/transport', icon: Activity, color: 'text-cyan-400' },
+      { label: t('dashboard.reportIssue'), path: '/emergency', icon: AlertTriangle, color: 'text-red-400' },
+    ],
+    volunteer: [
+      { label: t('dashboard.myTasks'), path: '/volunteer', icon: Users, color: 'text-emerald-400' },
+      { label: t('dashboard.crowdIntelBtn'), path: '/crowd', icon: Activity, color: 'text-orange-400' },
+      { label: t('dashboard.emergencyBtn'), path: '/emergency', icon: AlertTriangle, color: 'text-red-400' },
+    ],
+    security: [
+      { label: t('dashboard.crowdIntelBtn'), path: '/crowd', icon: Activity, color: 'text-orange-400' },
+      { label: t('dashboard.incidents'), path: '/emergency', icon: AlertTriangle, color: 'text-red-400' },
+      { label: t('dashboard.stadiumMapBtn'), path: '/map', icon: MapPin, color: 'text-blue-400' },
+    ],
+    operations: [
+      { label: t('dashboard.announcementsBtn'), path: '/announcements', icon: Zap, color: 'text-purple-400' },
+      { label: t('dashboard.crowdIntelBtn'), path: '/crowd', icon: Activity, color: 'text-orange-400' },
+      { label: t('dashboard.operationsBtn'), path: '/operations', icon: TrendingUp, color: 'text-blue-400' },
+    ],
+    medical: [
+      { label: t('dashboard.activeCases'), path: '/medical', icon: Activity, color: 'text-red-400' },
+      { label: t('dashboard.stadiumMapBtn'), path: '/map', icon: MapPin, color: 'text-blue-400' },
+      { label: t('dashboard.reportIncident'), path: '/emergency', icon: AlertTriangle, color: 'text-amber-400' },
+    ],
+    transport: [
+      { label: t('dashboard.transportIntel'), path: '/transport', icon: Activity, color: 'text-cyan-400' },
+      { label: t('dashboard.crowdMap'), path: '/map', icon: MapPin, color: 'text-blue-400' },
+      { label: t('dashboard.operationsBtn'), path: '/operations', icon: TrendingUp, color: 'text-purple-400' },
+    ],
+  }[user.role];
 
   React.useEffect(() => {
     analyzeCrowd();
@@ -244,10 +231,10 @@ export const DashboardPage: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <span className="badge-blue text-xs">
                 <span className="pulse-dot green" aria-hidden="true" />
-                Live — {STADIUM.match.stage}
+                {t('common.live')} — {STADIUM.match.stage}
               </span>
               <span className="text-xs text-muted-foreground">
-                {STADIUM.match.home} vs {STADIUM.match.away} • {STADIUM.name}
+                {STADIUM.match.home} {t('common.vs')} {STADIUM.match.away} • {STADIUM.name}
               </span>
             </div>
             <h1 className="text-2xl font-display font-bold text-foreground">{hero.greeting}</h1>
@@ -256,7 +243,7 @@ export const DashboardPage: React.FC = () => {
 
           {/* Quick Actions */}
           <div className="flex items-center gap-2 flex-wrap">
-            {hero.quickActions.map(({ label, path, icon: Icon, color }) => (
+            {quickActions.map(({ label, path, icon: Icon, color }) => (
               <Link
                 key={path}
                 to={path}
@@ -287,14 +274,14 @@ export const DashboardPage: React.FC = () => {
         {/* Crowd Chart */}
         <div className="lg:col-span-2 glass-card p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">Crowd Flow — Today</h3>
+            <h3 className="font-semibold text-foreground">{t('dashboard.crowdFlow')}</h3>
             <button
               onClick={() => analyzeCrowd()}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Refresh crowd analysis"
+              aria-label={t('dashboard.refreshAI')}
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              Refresh AI Analysis
+              {t('dashboard.refreshAI')}
             </button>
           </div>
           <ResponsiveContainer width="100%" height={200}>
@@ -307,7 +294,7 @@ export const DashboardPage: React.FC = () => {
                   </linearGradient>
                 ))}
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)'} />
               <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#6B7280' }} interval={3} />
               <YAxis tick={{ fontSize: 10, fill: '#6B7280' }} />
               <Tooltip {...CHART_TOOLTIP_STYLE} />
@@ -342,7 +329,7 @@ export const DashboardPage: React.FC = () => {
           <AIResponseCard
             response={aiData}
             isLoading={aiLoading}
-            title="AI Situation Analysis"
+            title={t('dashboard.aiAnalysis')}
             compact={true}
           />
         </div>
@@ -351,10 +338,10 @@ export const DashboardPage: React.FC = () => {
       {/* Incident Chart (ops/security only) */}
       {(user.role === USER_ROLES.OPERATIONS || user.role === USER_ROLES.SECURITY) && (
         <div className="glass-card p-5">
-          <h3 className="font-semibold text-foreground mb-4">Incident Timeline — Today</h3>
+          <h3 className="font-semibold text-foreground mb-4">{t('dashboard.incidentTimeline')}</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={INCIDENT_HISTORY} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)'} />
               <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#6B7280' }} />
               <YAxis tick={{ fontSize: 10, fill: '#6B7280' }} />
               <Tooltip {...CHART_TOOLTIP_STYLE} />

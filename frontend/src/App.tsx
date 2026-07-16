@@ -91,18 +91,18 @@ export default function App() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#1F2937',
-            color: '#F9FAFB',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: mode === 'light' ? '#FFFFFF' : '#1F2937',
+            color: mode === 'light' ? '#0F172A' : '#F9FAFB',
+            border: mode === 'light' ? '1px solid #E2E8F0' : '1px solid rgba(255,255,255,0.1)',
             borderRadius: '12px',
             fontSize: '14px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            boxShadow: mode === 'light' ? '0 4px 16px rgba(0,0,0,0.1)' : '0 8px 32px rgba(0,0,0,0.4)',
           },
           success: {
-            iconTheme: { primary: '#10B981', secondary: '#F9FAFB' },
+            iconTheme: { primary: '#10B981', secondary: mode === 'light' ? '#FFFFFF' : '#F9FAFB' },
           },
           error: {
-            iconTheme: { primary: '#EF4444', secondary: '#F9FAFB' },
+            iconTheme: { primary: '#EF4444', secondary: mode === 'light' ? '#FFFFFF' : '#F9FAFB' },
           },
         }}
       />

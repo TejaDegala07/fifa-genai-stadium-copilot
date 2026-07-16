@@ -15,6 +15,7 @@ import { AIResponseCard } from '../components/ai/AIResponseCard';
 import { useAI } from '../hooks/useAI';
 import { useVoice } from '../hooks/useVoice';
 import { useIncidentStore, useUserStore } from '../store/useAppStore';
+import { useTranslation } from '../hooks/useTranslation';
 import { MOCK_INCIDENTS } from '../data/mockData';
 import {
   getIncidentTypeLabel, getSeverityBgClass,
@@ -24,19 +25,20 @@ import { cn } from '../utils/helpers';
 import type { IncidentType } from '../data/constants';
 import { INCIDENT_TYPES } from '../data/constants';
 import type { Incident } from '../types';
+import type { TranslationKey } from '../i18n/translations';
 import toast from 'react-hot-toast';
 
 // ---- Incident Type Selector ------------------------------------------------
 
-const INCIDENT_OPTIONS = [
-  { type: INCIDENT_TYPES.MEDICAL, label: 'Medical', icon: Heart, color: 'text-red-400 bg-red-500/15 border-red-500/25', urgent: true },
-  { type: INCIDENT_TYPES.FIGHT, label: 'Fight / Altercation', icon: AlertTriangle, color: 'text-orange-400 bg-orange-500/15 border-orange-500/25', urgent: true },
-  { type: INCIDENT_TYPES.FIRE, label: 'Fire / Smoke', icon: Flame, color: 'text-red-500 bg-red-600/15 border-red-600/25', urgent: true },
-  { type: INCIDENT_TYPES.LOST_CHILD, label: 'Lost Child', icon: Baby, color: 'text-amber-400 bg-amber-500/15 border-amber-500/25', urgent: false },
-  { type: INCIDENT_TYPES.SUSPICIOUS_OBJECT, label: 'Suspicious Object', icon: Package, color: 'text-orange-400 bg-orange-500/15 border-orange-500/25', urgent: true },
-  { type: INCIDENT_TYPES.STAMPEDE, label: 'Crowd Surge', icon: AlertOctagon, color: 'text-red-400 bg-red-500/15 border-red-500/25', urgent: true },
-  { type: INCIDENT_TYPES.INFRASTRUCTURE, label: 'Infrastructure', icon: Wrench, color: 'text-blue-400 bg-blue-500/15 border-blue-500/25', urgent: false },
-  { type: INCIDENT_TYPES.WEATHER, label: 'Weather Hazard', icon: CloudRain, color: 'text-cyan-400 bg-cyan-500/15 border-cyan-500/25', urgent: false },
+const INCIDENT_OPTIONS: { type: IncidentType; labelKey: TranslationKey; icon: React.ElementType; color: string; urgent: boolean }[] = [
+  { type: INCIDENT_TYPES.MEDICAL, labelKey: 'emergency.type.medical', icon: Heart, color: 'text-red-400 bg-red-500/15 border-red-500/25', urgent: true },
+  { type: INCIDENT_TYPES.FIGHT, labelKey: 'emergency.type.fight', icon: AlertTriangle, color: 'text-orange-400 bg-orange-500/15 border-orange-500/25', urgent: true },
+  { type: INCIDENT_TYPES.FIRE, labelKey: 'emergency.type.fire', icon: Flame, color: 'text-red-500 bg-red-600/15 border-red-600/25', urgent: true },
+  { type: INCIDENT_TYPES.LOST_CHILD, labelKey: 'emergency.type.lostChild', icon: Baby, color: 'text-amber-400 bg-amber-500/15 border-amber-500/25', urgent: false },
+  { type: INCIDENT_TYPES.SUSPICIOUS_OBJECT, labelKey: 'emergency.type.suspiciousObject', icon: Package, color: 'text-orange-400 bg-orange-500/15 border-orange-500/25', urgent: true },
+  { type: INCIDENT_TYPES.STAMPEDE, labelKey: 'emergency.type.stampede', icon: AlertOctagon, color: 'text-red-400 bg-red-500/15 border-red-500/25', urgent: true },
+  { type: INCIDENT_TYPES.INFRASTRUCTURE, labelKey: 'emergency.type.infrastructure', icon: Wrench, color: 'text-blue-400 bg-blue-500/15 border-blue-500/25', urgent: false },
+  { type: INCIDENT_TYPES.WEATHER, labelKey: 'emergency.type.weather', icon: CloudRain, color: 'text-cyan-400 bg-cyan-500/15 border-cyan-500/25', urgent: false },
 ];
 
 // ---- Incident Timeline -----------------------------------------------------
@@ -47,7 +49,7 @@ const IncidentTimeline: React.FC<{ incident: Incident }> = ({ incident }) => (
       <div key={i} className="flex gap-3 text-sm">
         <div className="flex flex-col items-center">
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-          {i < incident.timeline.length - 1 && <div className="w-px flex-1 bg-white/10 mt-1" />}
+          {i < incident.timeline.length - 1 && <div className="w-px flex-1 bg-black/10 dark:bg-white/10 mt-1" />}
         </div>
         <div className="pb-3 min-w-0">
           <div className="font-medium text-foreground">{entry.event}</div>
@@ -64,6 +66,7 @@ const IncidentTimeline: React.FC<{ incident: Incident }> = ({ incident }) => (
 const IncidentCard: React.FC<{ incident: Incident; onSelect: (i: Incident) => void }> = ({
   incident, onSelect
 }) => {
+  const { t } = useTranslation();
   const statusColors: Record<string, string> = {
     reported: 'bg-amber-500/15 text-amber-400',
     acknowledged: 'bg-blue-500/15 text-blue-400',
@@ -79,7 +82,7 @@ const IncidentCard: React.FC<{ incident: Incident; onSelect: (i: Incident) => vo
       className={cn(
         'glass-card-hover p-4 cursor-pointer border',
         incident.severity === 'critical' ? 'border-red-500/30' :
-        incident.severity === 'high' ? 'border-orange-500/25' : 'border-white/8'
+        incident.severity === 'high' ? 'border-orange-500/25' : 'border-black/10 dark:border-white/8'
       )}
       onClick={() => onSelect(incident)}
       role="button"
@@ -96,10 +99,10 @@ const IncidentCard: React.FC<{ incident: Incident; onSelect: (i: Incident) => vo
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="text-xs font-mono text-muted-foreground">{incident.id}</span>
             <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', statusColors[incident.status])}>
-              {incident.status.replace('_', ' ')}
+              {t(`status.${incident.status}` as TranslationKey) || incident.status.replace('_', ' ')}
             </span>
           </div>
-          <h4 className="font-semibold text-sm text-foreground">{getIncidentTypeLabel(incident.type)}</h4>
+          <h4 className="font-semibold text-sm text-foreground">{t(`emergency.type.${incident.type}` as TranslationKey) || getIncidentTypeLabel(incident.type)}</h4>
           <p className="text-xs text-muted-foreground mt-0.5 truncate">{incident.location.zoneLabel}</p>
           <p className="text-xs text-muted-foreground">{timeAgo(incident.reportedAt)}</p>
         </div>
@@ -118,9 +121,10 @@ export const EmergencyPage: React.FC = () => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const { data: aiData, isLoading, reportEmergency, isUsingMock } = useAI();
+  const { data: aiData, isLoading, reportEmergency } = useAI();
   const { incidents, addIncident, updateIncident } = useIncidentStore();
   const { user } = useUserStore();
+  const { t } = useTranslation();
 
   const { isListening, transcript, startListening, stopListening, isSupported } = useVoice(
     (text) => setDescription((prev) => prev + ' ' + text)
@@ -180,8 +184,8 @@ export const EmergencyPage: React.FC = () => {
   return (
     <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
       <SectionHeader
-        title="Emergency Copilot"
-        subtitle="AI-powered incident triage, routing, and response coordination"
+        title={t('page.emergency')}
+        subtitle={t('page.emergency.subtitle')}
         icon={AlertOctagon}
         actions={
           <div className="flex items-center gap-2">
@@ -202,10 +206,10 @@ export const EmergencyPage: React.FC = () => {
               <div className="glass-card p-5">
                 <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-xs font-bold flex items-center justify-center">1</span>
-                  What is happening?
+                  {t('emergency.selectType')}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {INCIDENT_OPTIONS.map(({ type, label, icon: Icon, color, urgent }) => (
+                  {INCIDENT_OPTIONS.map(({ type, labelKey, icon: Icon, color, urgent }) => (
                     <button
                       key={type}
                       onClick={() => setSelectedType(type)}
@@ -213,7 +217,7 @@ export const EmergencyPage: React.FC = () => {
                         'relative flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-200',
                         selectedType === type
                           ? `${color} scale-[1.02]`
-                          : 'border-white/10 text-muted-foreground hover:border-white/20 hover:text-foreground'
+                          : 'border-black/10 dark:border-white/10 text-muted-foreground hover:border-black/20 dark:border-white/20 hover:text-foreground'
                       )}
                       aria-pressed={selectedType === type}
                     >
@@ -221,7 +225,7 @@ export const EmergencyPage: React.FC = () => {
                         <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500" aria-label="Urgent" />
                       )}
                       <Icon className="w-6 h-6" aria-hidden="true" />
-                      <span className="text-xs font-medium leading-tight">{label}</span>
+                      <span className="text-xs font-medium leading-tight">{t(labelKey)}</span>
                     </button>
                   ))}
                 </div>
@@ -231,16 +235,16 @@ export const EmergencyPage: React.FC = () => {
               <div className="glass-card p-5">
                 <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-xs font-bold flex items-center justify-center">2</span>
-                  Describe the situation
+                  {t('emergency.describe')}
                 </h2>
                 <div className="relative">
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(sanitizeText(e.target.value))}
-                    placeholder="Provide as much detail as possible — location, number of people involved, injuries, severity..."
+                    placeholder={t('emergency.describePlaceholder')}
                     rows={4}
                     maxLength={500}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary/40 focus:bg-white/8 transition-all"
+                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary/40 focus:bg-black/10 dark:bg-white/8 transition-all"
                     aria-label="Incident description"
                     aria-describedby="desc-count"
                   />
@@ -257,13 +261,13 @@ export const EmergencyPage: React.FC = () => {
                       'mt-3 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200',
                       isListening
                         ? 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse'
-                        : 'bg-white/5 text-muted-foreground border-white/10 hover:bg-white/8'
+                        : 'bg-black/5 dark:bg-white/5 text-muted-foreground border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/8'
                     )}
-                    aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
+                    aria-label={isListening ? t('common.stopVoice') : t('common.voiceInput')}
                     aria-pressed={isListening}
                   >
                     {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                    {isListening ? 'Listening... tap to stop' : 'Voice Description'}
+                    {isListening ? t('common.stopVoice') : t('emergency.voiceReport')}
                   </button>
                 )}
               </div>
@@ -272,14 +276,14 @@ export const EmergencyPage: React.FC = () => {
               <div className="glass-card p-5">
                 <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-xs font-bold flex items-center justify-center">3</span>
-                  Location (optional — uses your section by default)
+                  {t('emergency.location')}
                 </h2>
                 <input
                   value={location}
                   onChange={(e) => setLocation(sanitizeText(e.target.value))}
                   placeholder={`E.g. Section E, Row 22, near Gate 5 (default: your section ${user.section})`}
                   maxLength={150}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 focus:bg-white/8 transition-all"
+                  className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 focus:bg-black/10 dark:bg-white/8 transition-all"
                   aria-label="Incident location"
                 />
               </div>
@@ -292,19 +296,19 @@ export const EmergencyPage: React.FC = () => {
                   'w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-base transition-all duration-200',
                   selectedType && description.trim() && !isLoading
                     ? 'bg-red-500 hover:bg-red-600 text-white shadow-glow-red'
-                    : 'bg-white/10 text-muted-foreground cursor-not-allowed'
+                    : 'bg-black/10 dark:bg-white/10 text-muted-foreground cursor-not-allowed'
                 )}
                 aria-label="Submit emergency report"
               >
                 {isLoading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    AI Analyzing...
+                    {t('emergency.submitting')}
                   </>
                 ) : (
                   <>
                     <Send className="w-5 h-5" />
-                    Report Emergency — Get AI Response
+                    {t('emergency.submitReport')}
                   </>
                 )}
               </button>
@@ -324,7 +328,7 @@ export const EmergencyPage: React.FC = () => {
               <div className="flex justify-center gap-3">
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition-colors"
+                  className="px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                 >
                   Report Another
                 </button>
@@ -337,7 +341,6 @@ export const EmergencyPage: React.FC = () => {
             <AIResponseCard
               response={aiData}
               isLoading={isLoading}
-              isUsingMock={isUsingMock}
               title="AI Emergency Triage"
             />
           )}
@@ -348,7 +351,7 @@ export const EmergencyPage: React.FC = () => {
           <div className="glass-card p-5">
             <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
               <AlertOctagon className="w-4 h-4 text-red-400" />
-              Active Incidents ({activeIncidents.length})
+              {t('emergency.activeIncidents')} ({activeIncidents.length})
             </h3>
             <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-hide">
               {activeIncidents.map((incident) => (
@@ -384,7 +387,7 @@ export const EmergencyPage: React.FC = () => {
                   <p className="text-sm text-foreground">{selectedIncident.description}</p>
                   <p className="text-xs text-muted-foreground mt-1">{selectedIncident.location.zoneLabel}</p>
                 </div>
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Timeline</h4>
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{t('emergency.timeline')}</h4>
                 <IncidentTimeline incident={selectedIncident} />
                 {selectedIncident.assignedTeam && (
                   <div className="mt-3 flex items-center gap-2 text-xs text-emerald-400">

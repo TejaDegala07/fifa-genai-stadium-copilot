@@ -71,8 +71,8 @@ function AppShellInner({ children }: AppShellProps) {
   return (
     <div
       className={cn(
-        'flex h-screen overflow-hidden',
-        mode === 'light' && 'light',
+        'flex h-screen overflow-hidden bg-background text-foreground',
+        mode === 'light' ? 'light' : 'dark',
         highContrast && 'high-contrast',
         largeFontSize && 'large-text'
       )}

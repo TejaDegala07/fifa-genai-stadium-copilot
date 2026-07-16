@@ -25,7 +25,7 @@ const MEDICAL_STATS = [
 const MEDICAL_POIS = MOCK_POIS.filter(p => p.type === 'medical');
 
 export const MedicalPage: React.FC = () => {
-  const { data: aiData, isLoading, reportEmergency, isUsingMock } = useAI();
+  const { data: aiData, isLoading, reportEmergency } = useAI();
   const { incidents } = useIncidentStore();
 
   const medicalIncidents = incidents.filter(i => i.type === 'medical' && i.status !== 'resolved');
@@ -138,7 +138,7 @@ export const MedicalPage: React.FC = () => {
             </h3>
             <div className="space-y-3">
               {MEDICAL_POIS.map((poi) => (
-                <div key={poi.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/3 hover:bg-white/5 transition-colors">
+                <div key={poi.id} className="flex items-center gap-3 p-3 rounded-lg bg-black/5 dark:bg-white/3 hover:bg-black/5 dark:bg-white/5 transition-colors">
                   <div className={cn(
                     'w-2 h-2 rounded-full flex-shrink-0',
                     poi.currentStatus === 'open' ? 'bg-emerald-400' :
@@ -163,7 +163,6 @@ export const MedicalPage: React.FC = () => {
           <AIResponseCard
             response={aiData}
             isLoading={isLoading}
-            isUsingMock={isUsingMock}
             title="AI Medical Advisor"
             compact={true}
           />

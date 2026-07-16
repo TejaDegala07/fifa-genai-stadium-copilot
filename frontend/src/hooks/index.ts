@@ -19,3 +19,6 @@ export { useKeyboard } from './useKeyboard';
 
 // useCountUp — animated number counter
 export { useCountUp } from './useCountUp';
+
+// useTranslation — i18n translation hook
+export { useTranslation } from './useTranslation';

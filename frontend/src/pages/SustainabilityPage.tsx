@@ -43,7 +43,7 @@ const LEADERBOARD = [
 ];
 
 export const SustainabilityPage: React.FC = () => {
-  const { data: aiData, isLoading, getSustainability, isUsingMock } = useAI();
+  const { data: aiData, isLoading, getSustainability } = useAI();
   const tier = getEcoTier(ECO_SCORE);
   const tierColor = getEcoTierColor(tier);
 
@@ -119,7 +119,7 @@ export const SustainabilityPage: React.FC = () => {
               { label: 'Refills Used', value: '2', icon: '💧' },
               { label: 'Digital Ticket', value: 'Yes ✓', icon: '📱' },
             ].map(({ label, value, icon }) => (
-              <div key={label} className="p-3 rounded-xl bg-white/5 border border-white/8 text-center">
+              <div key={label} className="p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/8 text-center">
                 <div className="text-lg">{icon}</div>
                 <div className="font-semibold text-sm text-foreground">{value}</div>
                 <div className="text-xs text-muted-foreground">{label}</div>
@@ -143,7 +143,7 @@ export const SustainabilityPage: React.FC = () => {
                     </div>
                     <span className="font-medium text-foreground">{value}/{max}</span>
                   </div>
-                  <div className="h-2 bg-white/8 rounded-full overflow-hidden">
+                  <div className="h-2 bg-black/10 dark:bg-white/8 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(100, (value / max) * 100)}%` }}
@@ -170,7 +170,7 @@ export const SustainabilityPage: React.FC = () => {
                   className={cn(
                     'flex items-start gap-3 p-3 rounded-xl border',
                     priority === 'celebration' ? 'border-emerald-500/25 bg-emerald-500/8' :
-                    priority === 'high' ? 'border-blue-500/20 bg-blue-500/5' : 'border-white/8'
+                    priority === 'high' ? 'border-blue-500/20 bg-blue-500/5' : 'border-black/10 dark:border-white/8'
                   )}
                 >
                   <Icon className={cn(
@@ -201,7 +201,7 @@ export const SustainabilityPage: React.FC = () => {
                   key={rank}
                   className={cn(
                     'flex items-center gap-3 p-3 rounded-xl transition-colors',
-                    isYou ? 'bg-emerald-500/10 border border-emerald-500/20' : 'hover:bg-white/5'
+                    isYou ? 'bg-emerald-500/10 border border-emerald-500/20' : 'hover:bg-black/5 dark:bg-white/5'
                   )}
                 >
                   <span className="text-lg w-6 text-center">{badge || `#${rank}`}</span>
@@ -222,7 +222,6 @@ export const SustainabilityPage: React.FC = () => {
           <AIResponseCard
             response={aiData}
             isLoading={isLoading}
-            isUsingMock={isUsingMock}
             title="AI Eco Analysis"
             compact={true}
           />

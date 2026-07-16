@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { cn, formatNumber } from '../../utils/helpers';
 import { useCountUp } from '../../hooks/useCountUp';
+import { useTranslation } from '../../hooks/useTranslation';
 import type { OperationsKPI } from '../../types';
 
 interface KPICardProps {
@@ -25,6 +26,7 @@ const STATUS_BADGE = {
 };
 
 export const KPICard: React.FC<KPICardProps> = React.memo(({ kpi, index = 0, className }) => {
+  const { t } = useTranslation();
   const isNumeric = typeof kpi.value === 'number';
   const animatedValue = useCountUp(isNumeric ? (kpi.value as number) : 0);
 
@@ -75,7 +77,9 @@ export const KPICard: React.FC<KPICardProps> = React.memo(({ kpi, index = 0, cla
             <span className="text-sm text-muted-foreground">{kpi.unit}</span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mt-0.5">{kpi.label}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {kpi.labelKey ? t(kpi.labelKey) : kpi.label}
+        </p>
       </div>
     </motion.div>
   );

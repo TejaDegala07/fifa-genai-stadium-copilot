@@ -20,7 +20,6 @@ interface AIResponseCardProps {
   title?: string;
   compact?: boolean;
   className?: string;
-  isUsingMock?: boolean;
 }
 
 const PRIORITY_STYLES: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
@@ -39,9 +38,9 @@ function LoadingSkeleton() {
       </div>
       {[1, 2, 3].map((i) => (
         <div key={i} className="space-y-2">
-          <div className="h-3 bg-white/5 rounded-full w-24" />
-          <div className="h-4 bg-white/5 rounded w-full" />
-          <div className="h-4 bg-white/5 rounded w-3/4" />
+          <div className="h-3 bg-black/5 dark:bg-white/5 rounded-full w-24" />
+          <div className="h-4 bg-black/5 dark:bg-white/5 rounded w-full" />
+          <div className="h-4 bg-black/5 dark:bg-white/5 rounded w-3/4" />
         </div>
       ))}
     </div>
@@ -55,7 +54,6 @@ export const AIResponseCard = React.memo(({
   title = 'AI Analysis',
   compact = false,
   className,
-  isUsingMock = false,
 }: AIResponseCardProps) => {
   const [expanded, setExpanded] = useState(!compact);
 
@@ -108,9 +106,6 @@ export const AIResponseCard = React.memo(({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-            {isUsingMock && (
-              <span className="text-xs text-amber-400/80">Demo mode — offline intelligence</span>
-            )}
           </div>
         </div>
 
@@ -165,7 +160,7 @@ export const AIResponseCard = React.memo(({
 
             {/* Actions */}
             {response.actions && response.actions.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-white/10">
+              <div className="mt-4 pt-3 border-t border-black/10 dark:border-white/10">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
                   Recommended Actions
                 </p>
@@ -190,10 +185,10 @@ export const AIResponseCard = React.memo(({
             )}
 
             {/* Confidence */}
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-3">
+            <div className="mt-3 pt-3 border-t border-black/10 dark:border-white/10 flex items-center gap-3">
               <Shield className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">AI Confidence:</span>
-              <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${response.confidence}%` }}

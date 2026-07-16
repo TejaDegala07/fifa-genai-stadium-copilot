@@ -80,7 +80,7 @@ const TaskCard: React.FC<{ task: VolunteerTask; onAccept: (id: string) => void; 
     {task.skills && task.skills.length > 0 && (
       <div className="mt-3 flex flex-wrap gap-1.5">
         {task.skills.map((skill) => (
-          <span key={skill} className="text-xs px-2 py-0.5 rounded-full bg-white/8 border border-white/10 text-muted-foreground">
+          <span key={skill} className="text-xs px-2 py-0.5 rounded-full bg-black/10 dark:bg-white/8 border border-black/10 dark:border-white/10 text-muted-foreground">
             {skill}
           </span>
         ))}
@@ -90,7 +90,7 @@ const TaskCard: React.FC<{ task: VolunteerTask; onAccept: (id: string) => void; 
 );
 
 export const VolunteerPage: React.FC = () => {
-  const { data: aiData, isLoading, assignTasks, isUsingMock } = useAI();
+  const { data: aiData, isLoading, assignTasks } = useAI();
 
   useEffect(() => {
     assignTasks();
@@ -150,7 +150,6 @@ export const VolunteerPage: React.FC = () => {
           <AIResponseCard
             response={aiData}
             isLoading={isLoading}
-            isUsingMock={isUsingMock}
             title="AI Task Assignment"
           />
 

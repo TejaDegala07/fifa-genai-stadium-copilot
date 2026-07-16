@@ -13,7 +13,6 @@ export interface UseAIState {
   data: AIResponse | null;
   isLoading: boolean;
   error: string | null;
-  isUsingMock: boolean;
 }
 
 export interface UseAIActions {
@@ -30,7 +29,6 @@ export function useAI(): UseAIState & UseAIActions {
   const [data, setData] = useState<AIResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isUsingMock, setIsUsingMock] = useState(false);
 
   const { user } = useUserStore();
 
@@ -49,10 +47,8 @@ export function useAI(): UseAIState & UseAIActions {
     try {
       const result = await fn();
       setData(result);
-      setIsUsingMock(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'AI service unavailable. Using cached intelligence.');
-      setIsUsingMock(true);
+      setError(err instanceof Error ? err.message : 'AI service unavailable.');
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +106,7 @@ export function useAI(): UseAIState & UseAIActions {
   }, []);
 
   return {
-    data, isLoading, error, isUsingMock,
+    data, isLoading, error,
     analyzeCrowd, reportEmergency, getNavigation,
     analyzeTransport, assignTasks, getSustainability, reset,
   };

@@ -8,12 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   Search, LayoutDashboard, Map, AlertOctagon, Activity,
   Bus, Megaphone, Leaf, Settings, HandHelping, Stethoscope,
-  ArrowRight, Zap, Command as CommandIcon, X
+  ArrowRight, Zap, X
 } from 'lucide-react';
 import { Command } from 'cmdk';
 import FocusTrap from 'focus-trap-react';
-import { useCommandStore, useUserStore } from '../../store/useAppStore';
-import { useDebounce } from '../../hooks/useDebounce';
+import { useCommandStore, useUserStore, useThemeStore } from '../../store/useAppStore';
 import { cn } from '../../utils/helpers';
 
 interface CommandItem {
@@ -29,13 +28,37 @@ interface CommandItem {
 export const CommandPalette: React.FC = () => {
   const { isOpen, close } = useCommandStore();
   const [query, setQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
-  const { user } = useUserStore();
-  const debouncedQuery = useDebounce(query, 150);
+  const { mode } = useThemeStore();
+  const isLight = mode === 'light';
+
+  const [triggerRect, setTriggerRect] = useState<DOMRect | null>(null);
+
+  // Position based on trigger
+  useEffect(() => {
+    if (isOpen) {
+      const trigger = document.getElementById('quick-search-trigger');
+      if (trigger && trigger.offsetWidth > 0) {
+        setTriggerRect(trigger.getBoundingClientRect());
+      } else {
+        setTriggerRect(null);
+      }
+    } else {
+      setQuery('');
+    }
+  }, [isOpen]);
+
+  // Focus input automatically
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        document.getElementById('quick-search-input')?.focus();
+      }, 50);
+    }
+  }, [isOpen]);
 
   const commands: CommandItem[] = useMemo(() => [
-    { id: 'nav-dashboard', label: 'Go to Dashboard', description: 'Main overview', icon: LayoutDashboard, action: () => navigate('/'), category: 'Navigate', keywords: ['home', 'overview'] },
+    { id: 'nav-dashboard', label: 'Dashboard', description: 'Main overview', icon: LayoutDashboard, action: () => navigate('/'), category: 'Navigate', keywords: ['home', 'overview'] },
     { id: 'nav-crowd', label: 'Crowd Intelligence', description: 'Real-time crowd density', icon: Activity, action: () => navigate('/crowd'), category: 'Navigate', keywords: ['density', 'zone', 'congestion'] },
     { id: 'nav-map', label: 'Stadium Map', description: 'Interactive navigation', icon: Map, action: () => navigate('/map'), category: 'Navigate', keywords: ['navigation', 'route', 'find'] },
     { id: 'nav-emergency', label: 'Emergency Copilot', description: 'Report & manage incidents', icon: AlertOctagon, action: () => navigate('/emergency'), category: 'Navigate', keywords: ['incident', 'medical', 'fire', 'urgent'] },
@@ -48,61 +71,22 @@ export const CommandPalette: React.FC = () => {
     { id: 'action-emergency', label: 'Report Emergency', description: 'Immediately report an incident', icon: Zap, action: () => navigate('/emergency?action=report'), category: 'Quick Actions', keywords: ['help', 'sos', 'danger', 'urgent'] },
   ], [navigate]);
 
-  const filtered = useMemo(() => {
-    if (!debouncedQuery) return commands;
-    const q = debouncedQuery.toLowerCase();
-    return commands.filter(
-      (cmd) =>
-        cmd.label.toLowerCase().includes(q) ||
-        cmd.description?.toLowerCase().includes(q) ||
-        cmd.keywords.some((k) => k.includes(q)) ||
-        cmd.category.toLowerCase().includes(q)
-    );
-  }, [commands, debouncedQuery]);
-
+  // Group commands by category natively
   const grouped = useMemo(() => {
     const groups: Record<string, CommandItem[]> = {};
-    filtered.forEach((cmd) => {
+    commands.forEach((cmd) => {
       if (!groups[cmd.category]) groups[cmd.category] = [];
       groups[cmd.category].push(cmd);
     });
     return groups;
-  }, [filtered]);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [debouncedQuery]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setQuery('');
-      setSelectedIndex(0);
-    }
-  }, [isOpen]);
-
-  const executeSelected = useCallback(() => {
-    if (filtered[selectedIndex]) {
-      filtered[selectedIndex].action();
-      close();
-    }
-  }, [filtered, selectedIndex, close]);
+  }, [commands]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (!isOpen) return;
       if (e.key === 'Escape') close();
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1));
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex((i) => Math.max(i - 1, 0));
-      }
-      if (e.key === 'Enter') executeSelected();
     };
 
-    // Global Ctrl+K
     const handleGlobal = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -116,43 +100,58 @@ export const CommandPalette: React.FC = () => {
       window.removeEventListener('keydown', handleKey);
       window.removeEventListener('keydown', handleGlobal);
     };
-  }, [isOpen, close, executeSelected, filtered.length]);
-
-  let flatIndex = 0;
+  }, [isOpen, close]);
 
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <FocusTrap>
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
+        <FocusTrap focusTrapOptions={{ initialFocus: false, fallbackFocus: '#qs-fallback' }}>
+          <div className="fixed inset-0 z-50">
+            <button id="qs-fallback" className="sr-only" aria-hidden="true" tabIndex={0}>Fallback Focus</button>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={close}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm"
               aria-hidden="true"
             />
             
-            <Command.Dialog
-              open={isOpen}
-              onOpenChange={close}
-              className="relative w-full max-w-lg z-50"
+            <Command
+              className="absolute z-50"
+              style={triggerRect ? {
+                top: triggerRect.bottom + 8,
+                left: triggerRect.left,
+                width: triggerRect.width,
+              } : {
+                top: '20vh',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '100%',
+                maxWidth: '32rem'
+              }}
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.96, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: -10 }}
                 transition={{ duration: 0.15 }}
-                className="glass-card overflow-hidden"
+                className={cn(
+                  'overflow-hidden shadow-2xl',
+                  isLight ? 'bg-white border border-[#E2E8F0]' : 'bg-[#1A2035] border border-[rgba(255,255,255,0.1)]',
+                  'rounded-xl' // Same as search bar roughly
+                )}
               >
                 {/* Search input */}
-                <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+                <div className={cn(
+                  'flex items-center gap-3 px-4 py-3 border-b',
+                  isLight ? 'border-[#E2E8F0]' : 'border-black/10 dark:border-white/10'
+                )}>
                   <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <Command.Input
-                    autoFocus
+                    id="quick-search-input"
                     value={query}
                     onValueChange={setQuery}
                     placeholder="Search features, actions, sections..."
@@ -164,66 +163,64 @@ export const CommandPalette: React.FC = () => {
                 </div>
 
                 {/* Results */}
-                <Command.List
-                  className="max-h-80 overflow-y-auto p-2"
-                >
-                  {Object.keys(grouped).length === 0 ? (
-                    <div className="py-8 text-center text-muted-foreground text-sm">
-                      No results for "{query}"
-                    </div>
-                  ) : (
-                    Object.entries(grouped).map(([category, items]) => (
-                      <div key={category}>
-                        <div className="px-2 py-1 text-xs text-muted-foreground font-semibold uppercase tracking-wide">
-                          {category}
-                        </div>
-                        {items.map((item) => {
-                          const Icon = item.icon;
-                          const currentIndex = flatIndex++;
-                          const isSelected = currentIndex === selectedIndex;
-                          return (
-                            <button
-                              key={item.id}
-                              onClick={() => { item.action(); close(); }}
-                              onMouseEnter={() => setSelectedIndex(currentIndex)}
-                              className={cn(
-                                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors duration-100',
-                                isSelected ? 'bg-primary/20 text-foreground' : 'text-muted-foreground hover:bg-white/5'
+                <Command.List className="max-h-80 overflow-y-auto p-2">
+                  <Command.Empty className="py-8 text-center text-muted-foreground text-sm">
+                    No results found.
+                  </Command.Empty>
+                  
+                  {Object.entries(grouped).map(([category, items]) => (
+                    <Command.Group 
+                      key={category} 
+                      heading={category}
+                      className="px-2 py-1 text-xs text-muted-foreground font-semibold uppercase tracking-wide [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1 [&_[cmdk-group-heading]]:mb-1"
+                    >
+                      {items.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Command.Item
+                            key={item.id}
+                            value={`${item.label} ${item.description || ''} ${item.keywords.join(' ')}`}
+                            onSelect={() => { item.action(); close(); }}
+                            className={cn(
+                              'group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left cursor-pointer outline-none transition-colors duration-100',
+                              // cmdk automatically applies data-selected attribute to focused items
+                              'data-[selected=true]:bg-primary/20 data-[selected=true]:text-foreground',
+                              isLight
+                                ? 'text-muted-foreground hover:bg-gray-100'
+                                : 'text-muted-foreground hover:bg-black/5 dark:bg-white/5'
+                            )}
+                          >
+                            <div className={cn(
+                              'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
+                              isLight ? 'bg-gray-100' : 'bg-black/5 dark:bg-white/5'
+                            )}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-foreground">{item.label}</div>
+                              {item.description && (
+                                <div className="text-xs text-muted-foreground">{item.description}</div>
                               )}
-                              role="option"
-                              aria-selected={isSelected}
-                            >
-                              <div className={cn(
-                                'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
-                                isSelected ? 'bg-primary/25' : 'bg-white/5'
-                              )}>
-                                <Icon className="w-4 h-4" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-foreground">{item.label}</div>
-                                {item.description && (
-                                  <div className="text-xs text-muted-foreground">{item.description}</div>
-                                )}
-                              </div>
-                              {isSelected && (
-                                <ArrowRight className="w-4 h-4 text-primary flex-shrink-0" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ))
-                  )}
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-primary opacity-0 group-data-[selected=true]:opacity-100 flex-shrink-0 transition-opacity" />
+                          </Command.Item>
+                        );
+                      })}
+                    </Command.Group>
+                  ))}
                 </Command.List>
 
                 {/* Footer */}
-                <div className="px-4 py-2 border-t border-white/10 flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><kbd className="bg-white/10 px-1 rounded">↑↓</kbd> navigate</span>
-                  <span className="flex items-center gap-1"><kbd className="bg-white/10 px-1 rounded">↵</kbd> select</span>
-                  <span className="flex items-center gap-1"><kbd className="bg-white/10 px-1 rounded">ESC</kbd> close</span>
+                <div className={cn(
+                  'px-4 py-2 border-t flex items-center gap-4 text-xs text-muted-foreground',
+                  isLight ? 'border-[#E2E8F0]' : 'border-black/10 dark:border-white/10'
+                )}>
+                  <span className="flex items-center gap-1"><kbd className={cn('px-1 rounded', isLight ? 'bg-gray-100' : 'bg-black/10 dark:bg-white/10')}>↑↓</kbd> navigate</span>
+                  <span className="flex items-center gap-1"><kbd className={cn('px-1 rounded', isLight ? 'bg-gray-100' : 'bg-black/10 dark:bg-white/10')}>↵</kbd> select</span>
+                  <span className="flex items-center gap-1"><kbd className={cn('px-1 rounded', isLight ? 'bg-gray-100' : 'bg-black/10 dark:bg-white/10')}>ESC</kbd> close</span>
                 </div>
               </motion.div>
-            </Command.Dialog>
+            </Command>
           </div>
         </FocusTrap>
       )}

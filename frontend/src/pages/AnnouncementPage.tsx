@@ -50,15 +50,15 @@ const OutputBlock: React.FC<{ label: string; icon: React.ElementType; content: s
   };
 
   return (
-    <div className="rounded-xl bg-white/3 border border-white/8 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-white/3">
+    <div className="rounded-xl bg-black/5 dark:bg-white/3 border border-black/10 dark:border-white/8 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-black/10 dark:border-white/8 bg-black/5 dark:bg-white/3">
         <div className="flex items-center gap-2">
           <Icon className={cn('w-4 h-4', iconColor)} aria-hidden="true" />
           <span className="text-xs font-semibold text-foreground uppercase tracking-wide">{label}</span>
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-white/8"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/8"
           aria-label={`Copy ${label} announcement`}
         >
           {copied ? <CheckCheck className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -138,7 +138,7 @@ export const AnnouncementPage: React.FC = () => {
               placeholder="E.g. Gate B is overcrowded with fans not moving. Alternative routing needed..."
               rows={4}
               maxLength={500}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary/40 focus:bg-white/8 transition-all"
+              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary/40 focus:bg-black/10 dark:bg-white/8 transition-all"
             />
             <div className="mt-2 text-xs text-muted-foreground text-right">{situation.length}/500</div>
 
@@ -150,7 +150,7 @@ export const AnnouncementPage: React.FC = () => {
                   <button
                     key={i}
                     onClick={() => setSituation(t)}
-                    className="w-full text-left text-xs px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors truncate"
+                    className="w-full text-left text-xs px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5 dark:bg-white/5 transition-colors truncate"
                   >
                     → {t}
                   </button>
@@ -169,7 +169,7 @@ export const AnnouncementPage: React.FC = () => {
                   onClick={() => setTone(value)}
                   className={cn(
                     'p-3 rounded-xl border text-left transition-all duration-200',
-                    tone === value ? color : 'border-white/10 text-muted-foreground hover:border-white/20'
+                    tone === value ? color : 'border-black/10 dark:border-white/10 text-muted-foreground hover:border-black/20 dark:border-white/20'
                   )}
                   aria-pressed={tone === value}
                 >
@@ -188,7 +188,7 @@ export const AnnouncementPage: React.FC = () => {
                 onClick={() => setIncludeTranslations(!includeTranslations)}
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors duration-200 relative flex-shrink-0',
-                  includeTranslations ? 'bg-primary' : 'bg-white/20'
+                  includeTranslations ? 'bg-primary' : 'bg-black/20 dark:bg-white/20'
                 )}
                 role="switch"
                 aria-checked={includeTranslations}
@@ -212,7 +212,7 @@ export const AnnouncementPage: React.FC = () => {
               'w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-base transition-all duration-200',
               situation.trim() && !isLoading
                 ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white shadow-glow-blue'
-                : 'bg-white/10 text-muted-foreground cursor-not-allowed'
+                : 'bg-black/10 dark:bg-white/10 text-muted-foreground cursor-not-allowed'
             )}
           >
             {isLoading ? (
@@ -274,7 +274,7 @@ export const AnnouncementPage: React.FC = () => {
                             'flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
                             selectedLang === lang.code
                               ? 'bg-primary/20 text-primary border-primary/30'
-                              : 'text-muted-foreground border-white/10 hover:border-white/20'
+                              : 'text-muted-foreground border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20'
                           )}
                         >
                           <span>{lang.flag}</span>
@@ -288,7 +288,7 @@ export const AnnouncementPage: React.FC = () => {
                         initial={{ opacity: 0, x: 5 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -5 }}
-                        className="p-4 rounded-xl bg-white/3 border border-white/8"
+                        className="p-4 rounded-xl bg-black/5 dark:bg-white/3 border border-black/10 dark:border-white/8"
                       >
                         <p className="text-sm text-foreground leading-relaxed">
                           {output.translations[selectedLang as keyof typeof output.translations] ?? output.pa}

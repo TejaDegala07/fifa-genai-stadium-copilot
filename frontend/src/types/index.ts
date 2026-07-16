@@ -3,6 +3,7 @@
 // =============================================================================
 
 import type { UserRole, CrowdLevel, IncidentType, SeverityLevel, LanguageCode } from '../data/constants';
+import type { TranslationKey } from '../i18n/translations';
 
 // ---- AI Response Structure --------------------------------------------------
 
@@ -239,6 +240,7 @@ export interface VolunteerProfile {
 
 export interface OperationsKPI {
   label: string;
+  labelKey?: TranslationKey;
   value: number | string;
   unit?: string;
   change?: number; // percentage
@@ -263,7 +265,9 @@ export interface Alert {
   type: 'crowd' | 'incident' | 'transport' | 'weather' | 'system' | 'security';
   severity: SeverityLevel;
   title: string;
+  titleKey?: TranslationKey;
   message: string;
+  messageKey?: TranslationKey;
   zone?: string;
   createdAt: string;
   acknowledged: boolean;

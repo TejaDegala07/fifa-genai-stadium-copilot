@@ -22,7 +22,9 @@ import {
   getCrowdColor, getCrowdLabel, getCrowdBgClass,
   formatNumber, formatPercentNum, timeAgo
 } from '../utils/helpers';
+import { useTranslation } from '../hooks/useTranslation';
 import type { ZoneCrowdData } from '../types';
+import type { TranslationKey } from '../i18n/translations';
 import type { CrowdLevel } from '../data/constants';
 import { cn } from '../utils/helpers';
 
@@ -43,6 +45,7 @@ const TREND_COLORS = {
 const ZoneCard: React.FC<{ zone: ZoneCrowdData; onAnalyze: (id: string) => void; index: number }> = ({
   zone, onAnalyze, index
 }) => {
+  const { t } = useTranslation();
   const TrendIcon = TREND_ICONS[zone.trend];
   const densityPct = Math.round(zone.density * 100);
 
@@ -55,7 +58,7 @@ const ZoneCard: React.FC<{ zone: ZoneCrowdData; onAnalyze: (id: string) => void;
         'glass-card-hover p-4 border cursor-pointer group',
         zone.level === 'critical' ? 'border-red-500/25' :
         zone.level === 'high' ? 'border-orange-500/20' :
-        zone.level === 'moderate' ? 'border-amber-500/15' : 'border-white/8'
+        zone.level === 'moderate' ? 'border-amber-500/15' : 'border-black/10 dark:border-white/8'
       )}
       onClick={() => onAnalyze(zone.zoneId)}
       role="button"
@@ -67,12 +70,12 @@ const ZoneCard: React.FC<{ zone: ZoneCrowdData; onAnalyze: (id: string) => void;
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-semibold text-foreground text-sm">{zone.zoneLabel}</h3>
-          <p className="text-xs text-muted-foreground">Section {zone.section}</p>
+          <p className="text-xs text-muted-foreground">{t('crowd.section')} {zone.section}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className={cn('flex items-center gap-1 text-xs font-medium', TREND_COLORS[zone.trend])}>
             <TrendIcon className="w-3.5 h-3.5" />
-            {zone.trend}
+            {t(`crowd.trend.${zone.trend}` as TranslationKey)}
           </div>
           <StatusBadge
             type="crowd"
@@ -93,7 +96,7 @@ const ZoneCard: React.FC<{ zone: ZoneCrowdData; onAnalyze: (id: string) => void;
             {densityPct}%
           </span>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${densityPct}%` }}
@@ -110,10 +113,10 @@ const ZoneCard: React.FC<{ zone: ZoneCrowdData; onAnalyze: (id: string) => void;
                    bg-primary/8 hover:bg-primary/15 transition-colors opacity-0 group-hover:opacity-100
                    focus:opacity-100 duration-200"
         onClick={(e) => { e.stopPropagation(); onAnalyze(zone.zoneId); }}
-        aria-label={`Get AI analysis for ${zone.zoneLabel}`}
+        aria-label={`${t('crowd.aiAnalyze')} ${zone.zoneLabel}`}
       >
         <Activity className="w-3.5 h-3.5" />
-        AI Analyze
+        {t('crowd.aiAnalyze')}
       </button>
     </motion.div>
   );
@@ -132,7 +135,8 @@ const radarData = MOCK_CROWD_DATA.slice(0, 8).map((z) => ({
 export const CrowdIntelligencePage: React.FC = () => {
   const [filterLevel, setFilterLevel] = useState<CrowdLevel | 'all'>('all');
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
-  const { data: aiData, isLoading, analyzeCrowd, isUsingMock } = useAI();
+  const { data: aiData, isLoading, analyzeCrowd } = useAI();
+  const { t } = useTranslation();
 
   const handleAnalyze = (zoneId: string) => {
     setSelectedZone(zoneId);
@@ -157,17 +161,17 @@ export const CrowdIntelligencePage: React.FC = () => {
   return (
     <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
       <SectionHeader
-        title="Crowd Intelligence"
-        subtitle="Real-time crowd density analysis powered by AI"
+        title={t('page.crowdIntelligence')}
+        subtitle={t('page.crowdIntelligence.subtitle')}
         icon={Activity}
         actions={
           <button
             onClick={() => analyzeCrowd()}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/15 text-primary border border-primary/30 text-sm hover:bg-primary/25 transition-colors"
-            aria-label="Refresh all zones analysis"
+            aria-label={t('common.refreshCrowd')}
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh All
+            {t('crowd.refreshAll')}
           </button>
         }
       />
@@ -184,10 +188,10 @@ export const CrowdIntelligencePage: React.FC = () => {
           <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 animate-pulse" />
           <div>
             <p className="font-semibold text-red-400 text-sm">
-              ⚠ {criticalZones.length} Zone{criticalZones.length > 1 ? 's' : ''} at Critical Density
+              ⚠ {criticalZones.length} {t('crowd.criticalAlert')}
             </p>
             <p className="text-xs text-red-400/70 mt-0.5">
-              {criticalZones.map(z => z.zoneLabel).join(' • ')} — Immediate crowd management recommended
+              {criticalZones.map(z => z.zoneLabel).join(' • ')} — {t('crowd.immediateAction')}
             </p>
           </div>
         </motion.div>
@@ -197,7 +201,7 @@ export const CrowdIntelligencePage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Bar chart */}
         <div className="lg:col-span-2 glass-card p-5">
-          <h3 className="font-semibold text-foreground mb-4">Zone Density Comparison</h3>
+          <h3 className="font-semibold text-foreground mb-4">{t('crowd.zoneDensity')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={MOCK_CROWD_DATA} margin={{ top: 5, right: 0, left: -20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -219,7 +223,7 @@ export const CrowdIntelligencePage: React.FC = () => {
             {(['safe','moderate','high','critical'] as CrowdLevel[]).map((l) => (
               <div key={l} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getCrowdColor(l) }} />
-                {getCrowdLabel(l)}
+                {t(`crowd.${l}` as TranslationKey)}
               </div>
             ))}
           </div>
@@ -227,7 +231,7 @@ export const CrowdIntelligencePage: React.FC = () => {
 
         {/* Radar chart */}
         <div className="glass-card p-5">
-          <h3 className="font-semibold text-foreground mb-4">Zone Radar</h3>
+          <h3 className="font-semibold text-foreground mb-4">{t('crowd.zoneRadar')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <RadarChart data={radarData}>
               <PolarGrid stroke="rgba(255,255,255,0.08)" />
@@ -257,11 +261,11 @@ export const CrowdIntelligencePage: React.FC = () => {
               filterLevel === level
                 ? level === 'all' ? 'bg-primary/20 text-primary border-primary/30'
                   : `${getCrowdBgClass(level as CrowdLevel)} border-current`
-                : 'text-muted-foreground border-white/10 hover:border-white/20'
+                : 'text-muted-foreground border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20'
             )}
             aria-pressed={filterLevel === level}
           >
-            {level === 'all' ? 'All Zones' : getCrowdLabel(level as CrowdLevel)}
+            {level === 'all' ? t('crowd.allZones') : t(`crowd.${level}` as TranslationKey)}
             {level !== 'all' && (
               <span className="ml-1.5 opacity-60">
                 ({MOCK_CROWD_DATA.filter(z => z.level === level).length})
@@ -283,10 +287,9 @@ export const CrowdIntelligencePage: React.FC = () => {
         <AIResponseCard
           response={aiData}
           isLoading={isLoading}
-          isUsingMock={isUsingMock}
           title={selectedZone
-            ? `AI Analysis — ${MOCK_CROWD_DATA.find(z => z.zoneId === selectedZone)?.zoneLabel}`
-            : 'AI Crowd Intelligence'
+            ? `${t('crowd.aiAnalysis')} — ${MOCK_CROWD_DATA.find(z => z.zoneId === selectedZone)?.zoneLabel}`
+            : t('crowd.aiAnalysis')
           }
         />
       )}
