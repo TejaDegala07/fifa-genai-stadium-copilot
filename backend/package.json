@@ -38,6 +38,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@google/genai": "^2.12.0",
     "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",

@@ -2,3 +2,7 @@ node_modules
 dist
 .env
 logs
+backend/.env
+frontend/.env
+frontend/.env.production
+node_modules/
